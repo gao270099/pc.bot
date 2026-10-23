@@ -1,0 +1,52 @@
+name: Build Windows PC Application
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # 允许在 GitHub 网页上手动点击按钮触发打包
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: 1. 检出仓库代码
+        uses: actions/checkout@v4
+
+      - name: 2. 配置 Python 3.11 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 3. 升级基础包管理器
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: 4. 安装量化与图形依赖库
+        run: |
+          pip install -r requirements.txt
+
+      - name: 5. 使用 PyInstaller 编译为 Windows 可执行程序
+        run: |
+          python -m PyInstaller `
+            --noconfirm `
+            --onedir `
+            --windowed `
+            --name "OKX_Meta_Quant" `
+            --collect-all kivy `
+            --hidden-import=cryptography `
+            --hidden-import=ccxt `
+            --hidden-import=urllib.request `
+            main.py
+
+      - name: 6. 打包生成绿色安装 ZIP 压缩包
+        run: |
+          Compress-Archive -Path dist/OKX_Meta_Quant/* -DestinationPath OKX_Meta_Quant_Windows_Portable.zip
+
+      - name: 7. 上传编译产物到 GitHub 供直接下载
+        uses: actions/upload-artifact@v4
+        with:
+          name: OKX_Meta_Quant_Windows_x64
+          path: OKX_Meta_Quant_Windows_Portable.zip
+          retention-days: 30
