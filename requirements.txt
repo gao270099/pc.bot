@@ -1,0 +1,7 @@
+kivy[base]
+kivy_deps.sdl2
+kivy_deps.glew
+ccxt
+cryptography
+requests
+pyinstaller
