@@ -3,7 +3,7 @@ name: Build Windows PC Application
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch: # 允许在 GitHub 网页上手动点击按钮触发打包
+  workflow_dispatch:
 
 jobs:
   build-windows:
@@ -34,7 +34,12 @@ jobs:
             --onedir `
             --windowed `
             --name "OKX_Meta_Quant" `
-            --collect-all kivy `
+            --collect-data kivy `
+            --collect-binaries kivy_deps.sdl2 `
+            --collect-binaries kivy_deps.glew `
+            --exclude-module kivy.garden `
+            --exclude-module kivy.tests `
+            --exclude-module pytest `
             --hidden-import=cryptography `
             --hidden-import=ccxt `
             --hidden-import=urllib.request `
